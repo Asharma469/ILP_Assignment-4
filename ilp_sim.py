@@ -32,17 +32,22 @@ else:
     system.cpu.dispatchWidth = args.width
     system.cpu.wbWidth = args.width
     system.cpu.commitWidth = args.width
+    system.cpu.backComSize = 10
+    system.cpu.forwardComSize = 10
 
     # Branch Predictor Selection
     if args.bp_type == "2BitLocal" or args.bp_type == "LocalBP":
-        system.cpu.branchPred = LocalBP()
+        system.cpu.branchPred = BranchPredictor(
+            conditionalBranchPred=LocalBP()
+            )
     elif args.bp_type == "TournamentBP":
         system.cpu.branchPred = BranchPredictor(
-            conditionalBranchPred=TournamentBP(),
-            btb=SimpleBTB(numEntries=2048)
+            conditionalBranchPred=TournamentBP()
             )
     elif args.bp_type == "BiModeBP":
-        system.cpu.branchPred = BiModeBP()
+        system.cpu.branchPred = BranchPredictor(
+            conditionalBranchPred=BiModeBP()
+            )
 
 # Custom L1 Cache Subclasses
 class L1ICache(Cache):
@@ -67,15 +72,12 @@ class L1DCache(Cache):
 system.cpu.icache = L1ICache()
 system.cpu.dcache = L1DCache()
 
-# Crossbars & Port Connections
-system.l2bus = L2XBar()
-system.cpu.icache.cpu_side = system.cpu.icache_port
-system.cpu.icache.mem_side = system.l2bus.cpu_side_ports
-system.cpu.dcache.cpu_side = system.cpu.dcache_port
-system.cpu.dcache.mem_side = system.l2bus.cpu_side_ports
-
+# Crossbar & Port Connections
 system.membus = SystemXBar()
-system.l2bus.mem_side_ports = system.membus.cpu_side_ports
+system.cpu.icache.cpu_side = system.cpu.icache_port
+system.cpu.icache.mem_side = system.membus.cpu_side_ports
+system.cpu.dcache.cpu_side = system.cpu.dcache_port
+system.cpu.dcache.mem_side = system.membus.cpu_side_ports
 
 # Memory Controller Setup (DDR3)
 system.mem_ctrl = MemCtrl()
