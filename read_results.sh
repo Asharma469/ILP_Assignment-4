@@ -7,11 +7,6 @@ if [ ! -d "$RESULTS_DIR" ]; then
     exit 1
 fi
 
-for r in "$RESULTS_DIR"/run3_bp_local "$RESULTS_DIR"/run2_o3_base "$RESULTS_DIR"/run4_bp_bimode; do
-    echo "=== $r ==="
-    grep -E "system\\.cpu\\.ipc|simTicks|branchPred\\.condIncorrect" "$r/stats.txt"
-done
-
 echo "=========================================================================================================="
 echo -e "Run Directory\t\t| IPC\t\t| simTicks\t\t| Committed Insts\t| Branch Mispreds"
 echo "=========================================================================================================="
